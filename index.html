@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TopAds | Elite Digital Assets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              facebook: {
+                primary: '#0088CC', 
+                dark: '#006699',
+                glow: '#00ccff', // Cyan neon
+              },
+              dark: {
+                bg: '#020617', // Slate 950
+                card: '#0f172a', // Slate 900
+                border: '#1e293b', // Slate 800
+              }
+            },
+            animation: {
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'glow': 'glow 2s ease-in-out infinite alternate',
+              'float': 'float 6s ease-in-out infinite',
+              'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+              'marquee': 'marquee 25s linear infinite',
+            },
+            keyframes: {
+              glow: {
+                '0%': { boxShadow: '0 0 5px #0088CC, 0 0 10px #0088CC' },
+                '100%': { boxShadow: '0 0 20px #00ccff, 0 0 30px #00ccff' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-20px)' },
+              },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              marquee: {
+                '0%': { transform: 'translateX(0%)' },
+                '100%': { transform: 'translateX(-100%)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800;900&display=swap');
+      
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #020617; /* Dark BG base */
+        color: #ffffff;
+        scroll-behavior: smooth;
+      }
+      
+      .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* Cyber Grid Background */
+      .cyber-grid {
+        background-size: 40px 40px;
+        background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #020617;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1e293b;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #0088CC;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
