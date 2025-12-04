@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, HelpCircle, ShieldCheck, Zap, DollarSign, Lock } from 'lucide-react';
 
@@ -61,7 +62,7 @@ export const FAQView: React.FC = () => {
 
         <div className="space-y-12">
           {FAQS.map((section, secIdx) => (
-            <div key={secIdx}>
+            <div key={secIdx} className="reveal" style={{ transitionDelay: `${secIdx * 0.2}s` }}>
               <h3 className="text-xl font-bold text-white mb-6 pl-2 border-l-4 border-facebook-primary">{section.category}</h3>
               <div className="grid gap-4">
                 {section.items.map((item, idx) => {
@@ -99,7 +100,7 @@ export const FAQView: React.FC = () => {
           ))}
         </div>
 
-        <div className="mt-20 p-8 bg-gradient-to-r from-facebook-primary/10 to-transparent border border-facebook-primary/20 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="reveal mt-20 p-8 bg-gradient-to-r from-facebook-primary/10 to-transparent border border-facebook-primary/20 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 delay-300">
           <div>
             <h4 className="text-xl font-bold text-white mb-2">¿No encuentras tu respuesta?</h4>
             <p className="text-gray-400 text-sm">Nuestro equipo de soporte está disponible 24/7 en Telegram.</p>

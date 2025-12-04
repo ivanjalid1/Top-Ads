@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { User } from '../types';
 import { 
   Search, 
-  Bell, 
   ShoppingCart, 
   Menu, 
   ChevronDown, 
@@ -15,7 +15,8 @@ import {
   X,
   Shield,
   Zap,
-  Globe
+  Globe,
+  ChevronRight
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -50,6 +51,15 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
     };
   }, []);
 
+  // Prevent scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [isMobileMenuOpen]);
+
   const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
   const toggleLangMenu = () => setIsLangMenuOpen(!isLangMenuOpen);
 
@@ -62,16 +72,15 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
   ];
 
   return (
-    // Glassmorphism Header Dark
-    <header className="fixed top-0 w-full z-50 bg-[#020617]/80 backdrop-blur-xl border-b border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
-      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
+    // Glassmorphism Header: Very transparent background + Strong Blur
+    <header className="fixed top-0 w-full z-[100] bg-[#020617]/10 backdrop-blur-xl border-b border-white/5 shadow-lg transition-all duration-300">
+      <div className="container mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
         
         {/* Logo Area */}
         <div className="flex items-center gap-10">
-          <button onClick={() => onNavigate('home')} className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 flex items-center justify-center">
-              {/* Logo SVG Elite */}
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_15px_rgba(0,136,204,0.5)]">
+          <button onClick={() => onNavigate('home')} className="flex items-center gap-2 md:gap-3 group">
+            <div className="relative w-8 h-8 md:w-10 md:h-10 flex items-center justify-center">
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_0_15px_rgba(0,136,204,0.5)]">
                  <path d="M20 4L4 12V20C4 28.8 10.8 37 20 39.2C29.2 37 36 28.8 36 20V12L20 4Z" fill="url(#paint0_linear)" className="opacity-90"/>
                  <path d="M20 12V28M14 18L20 12L26 18" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
                  <defs>
@@ -83,8 +92,8 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
               </svg>
             </div>
             <div className="flex flex-col text-left">
-              <span className="text-xl font-black text-white tracking-tight leading-none">TOP<span className="text-facebook-primary">ADS</span></span>
-              <span className="text-[10px] text-gray-400 font-mono tracking-widest uppercase">Elite Assets</span>
+              <span className="text-lg md:text-xl font-black text-white tracking-tight leading-none">TOP<span className="text-facebook-primary">ADS</span></span>
+              <span className="text-[8px] md:text-[10px] text-gray-400 font-mono tracking-widest uppercase hidden sm:block">Elite Assets</span>
             </div>
           </button>
 
@@ -107,20 +116,20 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
           
-          {/* Search Trigger (Global) */}
+          {/* Search Trigger (Global) - Desktop */}
           <button 
              onClick={onOpenCommand}
-             className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-black/20 border border-white/5 rounded-lg text-gray-500 hover:text-white hover:border-white/20 transition-all text-sm group"
+             className="hidden lg:flex items-center gap-2 w-64 px-4 py-2.5 bg-black/20 border border-white/5 rounded-lg text-gray-500 hover:text-white hover:border-white/20 transition-all text-sm group"
              title="Buscar Activos"
           >
-            <Search size={14} />
+            <Search size={16} />
             <span className="group-hover:text-white">Buscar...</span>
           </button>
 
-          {/* Language Selector */}
-          <div className="relative" ref={langMenuRef}>
+          {/* Language Selector - Desktop */}
+          <div className="relative hidden lg:block" ref={langMenuRef}>
             <button 
               onClick={toggleLangMenu}
               className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-full text-sm font-medium text-gray-300 transition-all"
@@ -150,23 +159,26 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
             )}
           </div>
 
+          {/* Cart - Always Visible */}
+          <button 
+            onClick={() => onNavigate('cart')}
+            className="text-gray-400 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-colors relative"
+          >
+            <ShoppingCart size={22} />
+            <span className="absolute -top-1 -right-1 h-4 w-4 bg-facebook-primary rounded-full text-[10px] flex items-center justify-center text-white font-bold border border-[#020617]">2</span>
+          </button>
+
           {!user ? (
             /* LOGGED OUT */
-            <div className="flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-4">
               <button 
-                onClick={onOpenCommand}
-                className="md:hidden text-gray-400 hover:text-white"
-              >
-                <Search size={20} />
-              </button>
-              <button 
-                onClick={onLogin}
-                className="hidden md:block text-gray-300 hover:text-white font-medium px-2 transition-colors"
+                onClick={onLogin} 
+                className="text-gray-300 hover:text-white font-medium px-2 transition-colors"
               >
                 Acceder
               </button>
               <button 
-                onClick={onLogin}
+                onClick={() => onNavigate('register')}
                 className="bg-white text-black font-bold px-6 py-2.5 rounded-lg hover:bg-gray-200 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
               >
                 <Zap size={16} fill="black" />
@@ -176,29 +188,23 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
           ) : (
             /* LOGGED IN */
             <div className="flex items-center gap-2 sm:gap-4">
-              <button className="text-gray-400 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-colors relative">
-                <Bell size={20} />
-                <span className="absolute top-2 right-2 h-2 w-2 bg-facebook-primary rounded-full shadow-[0_0_10px_#0088CC]"></span>
-              </button>
               
-              <button className="text-gray-400 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-colors relative">
-                <ShoppingCart size={20} />
-                <span className="absolute -top-1 -right-1 h-4 w-4 bg-facebook-primary rounded-full text-[10px] flex items-center justify-center text-white font-bold border border-[#020617]">1</span>
-              </button>
-
-              {/* Balance Badge */}
-              <div className="hidden md:flex items-center bg-white/5 border border-white/10 rounded-lg pl-4 pr-1 py-1">
+              {/* Balance Display - Hidden on very small screens, shown in dropdown instead */}
+              <div className="hidden sm:flex items-center bg-white/5 border border-white/10 rounded-lg pl-3 pr-1 py-1">
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col items-end leading-none justify-center">
-                    <span className="font-bold text-white text-base font-mono tracking-tight">$ {user.balance.toFixed(2)}</span>
+                    <span className="font-bold text-white text-sm md:text-base font-mono tracking-tight">$ {user.balance.toFixed(2)}</span>
                   </div>
-                  <button className="w-8 h-8 rounded bg-facebook-primary hover:bg-facebook-glow flex items-center justify-center text-white transition-colors shadow-lg">
-                    <Plus size={16} />
+                  <button 
+                    onClick={() => onNavigate('balance')}
+                    className="w-7 h-7 md:w-8 md:h-8 rounded bg-facebook-primary hover:bg-facebook-glow flex items-center justify-center text-white transition-colors shadow-lg"
+                  >
+                    <Plus size={14} />
                   </button>
                 </div>
               </div>
 
-              {/* User Avatar */}
+              {/* User Menu Trigger - Visible on Mobile too now */}
               <div className="relative" ref={userMenuRef}>
                 <button 
                   onClick={toggleUserMenu}
@@ -210,9 +216,9 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
                   <ChevronDown size={14} className="text-gray-500 hidden md:block" />
                 </button>
 
-                {/* Dropdown */}
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 top-full mt-4 w-72 bg-[#0f172a] rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 py-2 z-50 overflow-hidden backdrop-blur-3xl ring-1 ring-white/5 animate-fade-in-up origin-top-right">
+                  // FIXED: Removed opacity/transparency from bg color (bg-[#0f172a] solid) for readability
+                  <div className="absolute right-0 top-full mt-4 w-72 bg-[#0f172a] rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 py-2 z-50 overflow-hidden ring-1 ring-white/5 animate-fade-in-up origin-top-right">
                     <div className="px-5 py-4 border-b border-white/5 bg-black/20">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="w-10 h-10 rounded-full bg-facebook-primary/20 flex items-center justify-center text-facebook-primary">
@@ -221,29 +227,30 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
                         <div>
                            <p className="font-bold text-white text-sm">{user.username}</p>
                            <p className="text-xs text-gray-500 truncate w-32">{user.email}</p>
+                           {/* Show balance in dropdown on mobile */}
+                           <p className="text-sm font-mono text-green-400 font-bold mt-1 sm:hidden">$ {user.balance.toFixed(2)}</p>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 uppercase tracking-wider">
-                          Nivel Gold
-                        </span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wider">
-                          {user.role}
-                        </span>
                       </div>
                     </div>
 
                     <div className="p-2 space-y-1">
                       {[
-                        { icon: LayoutDashboard, label: 'Panel de Control' },
-                        { icon: Package, label: 'Mis Pedidos' },
-                        { icon: DollarSign, label: 'Historial de Pagos' },
-                        { icon: Shield, label: 'Verificación de Identidad' },
+                        { id: 'dashboard', icon: LayoutDashboard, label: 'Panel de Control' },
+                        { id: 'orders', icon: Package, label: 'Mis Pedidos' },
+                        { id: 'balance', icon: DollarSign, label: 'Historial de Pagos' },
+                        { id: 'profile', icon: Shield, label: 'Verificación de Identidad' },
                       ].map((item, idx) => (
-                        <a key={idx} href="#" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                        <button 
+                          key={idx} 
+                          onClick={() => {
+                            onNavigate(item.id);
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group"
+                        >
                           <item.icon size={16} className="group-hover:text-facebook-primary transition-colors" />
                           {item.label}
-                        </a>
+                        </button>
                       ))}
                     </div>
 
@@ -267,7 +274,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
 
           {/* Mobile Toggle */}
           <button 
-            className="lg:hidden text-gray-400 hover:text-white"
+            className="lg:hidden text-white bg-white/5 p-2 rounded-lg border border-white/5 active:scale-95 transition-transform"
             onClick={() => setIsMobileMenuOpen(true)}
           >
             <Menu size={24} />
@@ -275,16 +282,36 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[60] lg:hidden bg-black animate-fade-in-up">
-          <div className="p-6 flex flex-col h-full">
-            <div className="flex justify-between items-center mb-10">
-              <span className="text-2xl font-black text-white">TOP<span className="text-facebook-primary">ADS</span></span>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400"><X size={28} /></button>
-            </div>
+      {/* MOBILE MENU OVERLAY - STRUCTURED & ALIGNED TOP */}
+      {isMobileMenuOpen && createPortal(
+        <div className="fixed inset-0 z-[110] lg:hidden bg-[#020617]/95 backdrop-blur-2xl animate-fade-in-up flex flex-col h-[100dvh] overflow-hidden">
+          {/* Mobile Menu Header */}
+          <div className="h-16 flex items-center justify-between px-4 border-b border-white/5 bg-[#020617]/50 shrink-0">
+              <span className="text-xl font-black text-white">TOP<span className="text-facebook-primary">ADS</span></span>
+              <button 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                className="p-2 bg-white/5 rounded-full text-white hover:bg-white/10 active:scale-95 transition-transform border border-white/5"
+              >
+                <X size={20} />
+              </button>
+          </div>
+          
+          <div className="flex-1 flex flex-col p-5 h-full overflow-y-auto">
             
-            <nav className="flex flex-col gap-6 flex-grow">
+            {/* Mobile Search - Integrated Top */}
+            <div className="mb-6">
+               <button 
+                 onClick={() => {onOpenCommand?.(); setIsMobileMenuOpen(false);}}
+                 className="w-full flex items-center gap-3 px-4 py-3 bg-[#0f172a] border border-white/10 rounded-xl text-gray-400 hover:border-white/20 transition-all shadow-inner"
+               >
+                 <Search size={18} />
+                 <span className="text-sm font-medium">Buscar activos, BMs, perfiles...</span>
+               </button>
+            </div>
+
+            {/* Mobile Nav Links - Aligned Top */}
+            <nav className="flex flex-col gap-2">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest px-1 mb-1">Navegación</h3>
               {navItems.map(item => (
                 <button 
                   key={item.id} 
@@ -292,21 +319,59 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogin, onOpenC
                     onNavigate(item.id);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`text-2xl font-medium text-left ${currentView === item.id ? 'text-facebook-primary' : 'text-gray-300 hover:text-white'}`}
+                  className={`text-base font-bold text-left py-3 px-4 rounded-xl transition-all flex items-center justify-between group ${
+                    currentView === item.id 
+                    ? 'text-white bg-white/5 border border-white/10 shadow-lg' 
+                    : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                  }`}
                 >
-                  {item.label}
+                  <span className="flex items-center gap-3">
+                    {/* Active Indicator Dot */}
+                    <span className={`w-1.5 h-1.5 rounded-full transition-colors ${currentView === item.id ? 'bg-facebook-primary shadow-[0_0_8px_#1877F2]' : 'bg-gray-700 group-hover:bg-gray-500'}`}></span>
+                    {item.label}
+                  </span>
+                  <ChevronRight size={16} className={`transition-transform ${currentView === item.id ? 'text-facebook-primary' : 'text-gray-700 group-hover:text-gray-500'}`} />
                 </button>
               ))}
             </nav>
-            
-            {!user && (
-              <div className="grid grid-cols-2 gap-4 mt-auto">
-                 <button onClick={() => {onLogin(); setIsMobileMenuOpen(false)}} className="py-4 border border-white/20 rounded-xl font-bold text-white">Acceder</button>
-                 <button onClick={() => {onLogin(); setIsMobileMenuOpen(false)}} className="py-4 bg-facebook-primary text-white rounded-xl font-bold">Registrarse</button>
-              </div>
-            )}
+
+            {/* Spacer to push footer to bottom */}
+            <div className="mt-auto"></div>
+
+            {/* Footer Actions (Auth & Lang) */}
+            <div className="space-y-4 pt-6 border-t border-white/5 mt-6">
+                {/* Mobile User Actions */}
+                {!user && (
+                  <div className="grid grid-cols-2 gap-3">
+                     <button 
+                        onClick={() => {onLogin(); setIsMobileMenuOpen(false)}} 
+                        className="w-full py-3 border border-white/10 rounded-xl font-bold text-white text-sm uppercase tracking-wide hover:bg-white/5 transition-all"
+                     >
+                       Acceder
+                     </button>
+                     <button 
+                        onClick={() => {onNavigate('register'); setIsMobileMenuOpen(false)}} 
+                        className="w-full py-3 bg-white text-black rounded-xl font-bold text-sm uppercase tracking-wide shadow-lg hover:bg-gray-200 transition-all"
+                     >
+                       Unirse
+                     </button>
+                  </div>
+                )}
+                
+                {/* Mobile Language - Compact Row */}
+                <div className="flex justify-center items-center gap-2 py-2">
+                   <span className="text-xs font-bold text-gray-600 uppercase mr-2">Idioma:</span>
+                   {['ES', 'EN', 'RU'].map(lang => (
+                     <button key={lang} className="px-3 py-1.5 rounded-lg bg-white/5 flex items-center justify-center text-xs font-bold text-gray-400 hover:bg-white/10 hover:text-white border border-white/5 transition-all">
+                        {lang}
+                     </button>
+                   ))}
+                </div>
+            </div>
+
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );
